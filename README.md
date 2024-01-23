@@ -1,22 +1,22 @@
-# Budget Tracker Bash Script
+# 🌌 Budget Invader - A Budget Tracker Inspired by Galaga
 
-## Overview
-This project is a Bash script designed for macOS, providing a simple yet effective way to track and manage your budget. It allows users to add, view, delete, and calculate total expenses over a specified period. The data is stored in a CSV file for easy viewing and archiving.
+## 🚀 Overview
+Embark on a cosmic journey to manage your finances with **Budget Invader**! Inspired by the classic arcade game Galaga, this Bash script for macOS is your cockpit to navigate through the galaxy of budgeting. Track your expenses, and manage your budget like a space adventure!
 
-## Features
-- Add new budget entries with details like amount, category, payment method, and more.
-- View all budget entries in a simple format.
-- Delete all entries to reset the budget tracker.
-- Create new versions of the CSV file for data archiving.
-- Calculate total expenses for a specified time period.
+## 🌟 Features
+- 🛸 **Add New Entries**: Log your expenses with details such as amount, category, and payment method.
+- 👀 **View All Entries**: Check out your financial journey in a neatly formatted log.
+- 💥 **Delete All Entries**: Clear your slate for a fresh financial start.
+- 📁 **Version Control**: Archive old data and start new logs effortlessly.
+- 📊 **Calculate Totals**: Analyze your spending over specific time periods.
 
-## Getting Started
+## 🛠 Getting Started
 
 ### Prerequisites
-- macOS operating system
-- Basic understanding of terminal and bash commands
+- 🍏 macOS operating system.
+- 🖥 A basic understanding of terminal and bash commands.
 
 ### Installation
-1. Clone the repository to your local machine:
+1. Beam the repository to your local machine:
    ```bash
-   git clone [your-repository-link]
+   git clone https://github.com/suzyeaston/budgetinvancity/
