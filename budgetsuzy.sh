@@ -7,7 +7,7 @@ TIME=$(date +%T) # Current time
 
 # Function to initialize or reset the CSV file
 initialize_csv() {
-    echo "Date,Time,Amount,Category,Payment Method,Description,Recurring,Amount Saved,Priority,Type,Due Date" > $FILE
+    echo "Date,Time,Amount,Category,Payment Method,Description,Recurring,Recurrence Period,Type,Due Date" > $FILE
 }
 
 # Function to create a new version of the CSV file
@@ -34,17 +34,28 @@ add_entry() {
     read description
     echo "Is this a recurring expense? (yes/no):"
     read recurring
-    echo "Enter the amount saved (if applicable):"
-    read amount_saved
-    echo "Enter the priority level (High/Medium/Low):"
-    read priority
+    if [[ $recurring == "yes" ]]; then
+        echo "Enter the recurrence period (e.g., Monthly, Bi-Monthly):"
+        read recurrence_period
+    else
+        recurrence_period="N/A"
+    fi
     echo "Enter the type of bill:"
     read type
     echo "Enter the due date (YYYY-MM-DD):"
     read due_date
 
     # Append the new entry to the file
-    echo "$DATE,$TIME,$amount,$category,$payment_method,$description,$recurring,$amount_saved,$priority,$type,$due_date" >> $FILE
+    echo "$DATE,$TIME,$amount,$category,$payment_method,$description,$recurring,$recurrence_period,$type,$due_date" >> $FILE
+    if [[ $recurring == "yes" ]]; then
+        # Calculate and add recurring entries
+        for i in {1..6}; do
+            # This is a simplified way to handle monthly recurrences.
+            # For more complex recurrences, additional logic is needed.
+            next_due_date=$(date -d "$due_date +$i month" +%F)
+            echo "$DATE,$TIME,$amount,$category,$payment_method,$description,$recurring,$recurrence_period,$type,$next_due_date" >> $FILE
+        done
+    fi
     echo -e "\e[32mEntry added successfully!\e[0m"
 }
 
