@@ -40,19 +40,16 @@ add_entry() {
     else
         recurrence_period="N/A"
     fi
-    echo "Enter the type of bill:"
-    read type
     echo "Enter the due date (YYYY-MM-DD):"
     read due_date
 
     # Append the new entry to the file
-    echo "$DATE,$TIME,$amount,$category,$payment_method,$description,$recurring,$recurrence_period,$type,$due_date" >> $FILE
+    echo "$DATE,$TIME,$amount,$category,$payment_method,$description,$recurring,$recurrence_period,$due_date" >> $FILE
     if [[ $recurring == "yes" ]]; then
         # Calculate and add recurring entries
         for i in {1..6}; do
-            # Adjustments are needed for other recurrence periods.
             next_due_date=$(date -j -v+${i}m -f "%Y-%m-%d" "$due_date" +%F)
-            echo "$DATE,$TIME,$amount,$category,$payment_method,$description,$recurring,$recurrence_period,$type,$next_due_date" >> $FILE
+            echo "$DATE,$TIME,$amount,$category,$payment_method,$description,$recurring,$recurrence_period,$next_due_date" >> $FILE
         done
     fi
     echo -e "\e[32mEntry added successfully!\e[0m"
