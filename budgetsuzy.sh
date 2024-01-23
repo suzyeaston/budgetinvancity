@@ -50,9 +50,8 @@ add_entry() {
     if [[ $recurring == "yes" ]]; then
         # Calculate and add recurring entries
         for i in {1..6}; do
-            # This is a simplified way to handle monthly recurrences.
-            # For more complex recurrences, additional logic is needed.
-            next_due_date=$(date -d "$due_date +$i month" +%F)
+            # Adjustments are needed for other recurrence periods.
+            next_due_date=$(date -j -v+${i}m -f "%Y-%m-%d" "$due_date" +%F)
             echo "$DATE,$TIME,$amount,$category,$payment_method,$description,$recurring,$recurrence_period,$type,$next_due_date" >> $FILE
         done
     fi
