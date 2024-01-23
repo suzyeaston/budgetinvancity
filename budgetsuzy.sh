@@ -10,6 +10,13 @@ initialize_csv() {
     echo "Date,Time,Amount,Type,Due Date" > $FILE
 }
 
+# Function to create a new version of the CSV file
+create_new_version() {
+    mv "$FILE" "${FILE%.csv}-$(date +%F-%T).csv"
+    initialize_csv
+    echo -e "\e[34mNew version created and old data archived.\e[0m"
+}
+
 # Check if the CSV file exists, if not create it with headers
 if [ ! -f "$FILE" ]; then
     initialize_csv
@@ -60,7 +67,8 @@ while true; do
     echo "1. Add new entry"
     echo "2. View all entries"
     echo "3. Delete all entries"
-    echo "4. Exit"
+    echo "4. Create new version"
+    echo "5. Exit"
     echo "Choose an option:"
     read option
 
@@ -68,7 +76,8 @@ while true; do
         1) add_entry ;;
         2) view_entries ;;
         3) delete_all_entries ;;
-        4) break ;;
+        4) create_new_version ;;
+        5) break ;;
         *) echo "Invalid option. Please try again." ;;
     esac
 done
