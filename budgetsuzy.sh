@@ -7,7 +7,7 @@ TIME=$(date +%T) # Current time
 
 # Function to initialize or reset the CSV file
 initialize_csv() {
-    echo "Date,Time,Amount,Category,Payment Method,Description,Recurring,Recurrence Period,Type,Due Date" > $FILE
+    echo "Date,Time,Amount,Category,Payment Method,Description,Recurring,Recurrence Period,Due Date" > $FILE
 }
 
 # Function to create a new version of the CSV file
@@ -80,6 +80,20 @@ delete_all_entries() {
     fi
 }
 
+# Function to calculate totals for a specified period
+calculate_totals() {
+    start_date=$1  # start date of the pay period
+    end_date=$2    # end date of the pay period
+    total=0
+    while IFS=, read -r date time amount category payment_method description recurring recurrence_period due_date
+    do
+        if [[ "$date" > "$start_date" && "$date" < "$end_date" ]]; then
+            total=$(echo "$total + $amount" | bc)
+        fi
+    done < $FILE
+    echo "Total expenses from $start_date to $end_date: $total"
+}
+
 # Main menu
 while true; do
     echo "Welcome to your Budget Tracker!"
@@ -87,7 +101,8 @@ while true; do
     echo "2. View all entries"
     echo "3. Delete all entries"
     echo "4. Create new version"
-    echo "5. Exit"
+    echo "5. Calculate totals for a period"
+    echo "6. Exit"
     echo "Choose an option:"
     read option
 
@@ -96,7 +111,12 @@ while true; do
         2) view_entries ;;
         3) delete_all_entries ;;
         4) create_new_version ;;
-        5) break ;;
+        5) echo "Enter the start date (YYYY-MM-DD):"
+           read start_date
+           echo "Enter the end date (YYYY-MM-DD):"
+           read end_date
+           calculate_totals "$start_date" "$end_date" ;;
+        6) break ;;
         *) echo "Invalid option. Please try again." ;;
     esac
 done
