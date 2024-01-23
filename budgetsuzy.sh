@@ -7,7 +7,7 @@ TIME=$(date +%T) # Current time
 
 # Function to initialize or reset the CSV file
 initialize_csv() {
-    echo "Date,Time,Amount,Type,Due Date" > $FILE
+    echo "Date,Time,Amount,Category,Payment Method,Description,Recurring,Amount Saved,Priority,Type,Due Date" > $FILE
 }
 
 # Function to create a new version of the CSV file
@@ -26,13 +26,25 @@ fi
 add_entry() {
     echo "Enter the amount:"
     read amount
+    echo "Enter the category (e.g., Groceries, Rent, Entertainment):"
+    read category
+    echo "Enter the payment method (e.g., Cash, Credit Card, PayPal):"
+    read payment_method
+    echo "Enter a description or note (optional):"
+    read description
+    echo "Is this a recurring expense? (yes/no):"
+    read recurring
+    echo "Enter the amount saved (if applicable):"
+    read amount_saved
+    echo "Enter the priority level (High/Medium/Low):"
+    read priority
     echo "Enter the type of bill:"
     read type
     echo "Enter the due date (YYYY-MM-DD):"
     read due_date
 
     # Append the new entry to the file
-    echo "$DATE,$TIME,$amount,$type,$due_date" >> $FILE
+    echo "$DATE,$TIME,$amount,$category,$payment_method,$description,$recurring,$amount_saved,$priority,$type,$due_date" >> $FILE
     echo -e "\e[32mEntry added successfully!\e[0m"
 }
 
