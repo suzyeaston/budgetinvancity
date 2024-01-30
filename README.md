@@ -1,14 +1,16 @@
 # 🌌 Budget In Vancity- A Budget Tracker Inspired by Vancouver
 
 ## 🚀 Overview
-Embark on a cosmic journey to manage your finances with **Budget In Vancity**! This Bash script for macOS is a way to navigate through the galaxy of budgeting. Track your expenses, and manage your budget like Jem and the Rockers
+Embark on a cosmic journey to manage your finances with **Budget In Vancity**! This Bash script for macOS navigates through the galaxy of budgeting, bringing the flair of Jem and the Rockers to your financial management. Track your expenses, view real-time totals, and get alerts for upcoming dues, all with a fun, interactive twist!
 
 ## 🌟 Features
-- 🛸 **Add New Entries**: Log your expenses with details such as amount, category, and payment method.
+- 🛸 **Add New Entries**: Log your expenses with details such as amount, category, payment method, and more.
 - 👀 **View All Entries**: Check out your financial journey in a formatted log.
 - 💥 **Delete All Entries**: Clear your slate for a fresh financial start.
 - 📁 **Version Control**: Archive old data and start new logs.
 - 📊 **Calculate Totals**: Analyze your spending over specific time periods.
+- 🌠 **Display Total Expenses**: Get real-time updates on your total expenses at any point.
+- 🔮 **Highlight Upcoming Dues**: Stay ahead with alerts on dues coming up in the next week.
 
 ## 🛠 Getting Started
 
@@ -20,3 +22,11 @@ Embark on a cosmic journey to manage your finances with **Budget In Vancity**! T
 1. Beam the repository to your local machine:
    ```bash
    git clone https://github.com/suzyeaston/budgetinvancity/
+
+### 💡 Tips for Optimal Use
+- Regularly update your entries to keep the real-time tracking accurate.
+- Use the 'Highlight Upcoming Dues' feature to avoid missing important payments.
+- Explore the 'Calculate Totals' function to get insights into your spending habits.
+
+### Enjoy Your Financial Journey lol
+With Budget In Vancity, budgeting isn't just about numbers; it's an adventurous journey through your financial galaxy ahahahhahahahah!
