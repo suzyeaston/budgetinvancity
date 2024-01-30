@@ -7,7 +7,7 @@ TIME=$(date +%T) # Current time
 
 # Function to initialize or reset the CSV file
 initialize_csv() {
-    echo "Date,Time,Amount,Category,Payment Method,Description,Recurring,Recurrence Period,Due Date" > $FILE
+    echo "Amount,Category,Payment Method,Description,Recurring,Recurrence Period,Due Date" > $FILE
 }
 
 # Function to create a new version of the CSV file
@@ -28,10 +28,8 @@ add_entry() {
     read amount
     echo "Enter the category (e.g., Groceries, Rent, Entertainment):"
     read category
-    echo "Enter the payment method (e.g., Cash, Credit Card, PayPal):"
+    echo "Enter the payment method (e.g., Debit, Credit Card, PayPal):"
     read payment_method
-    echo "Enter a description or note (optional):"
-    read description
     echo "Is this a recurring expense? (yes/no):"
     read recurring
     if [[ $recurring == "yes" ]]; then
