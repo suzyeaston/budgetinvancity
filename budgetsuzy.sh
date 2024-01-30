@@ -28,14 +28,14 @@ add_entry() {
     read amount
     echo "Enter the category (e.g., Groceries, Rent, Entertainment):"
     read category
-    echo "Enter the payment method (e.g., Debit, Credit Card, PayPal):"
+    echo "Enter the payment method (e.g., Cash, Credit Card, PayPal):"
     read payment_method
     echo "Enter a description or note (optional):"
     read description
     echo "Is this a recurring expense? (yes/no):"
     read recurring
     if [[ $recurring == "yes" ]]; then
-        echo "Enter the recurrence period (e.g., Monthly, Bi-Weekly):"
+        echo "Enter the recurrence period (e.g., Monthly, Bi-Monthly):"
         read recurrence_period
     else
         recurrence_period="N/A"
@@ -46,19 +46,11 @@ add_entry() {
     # Append the new entry to the file
     echo "$DATE,$TIME,$amount,$category,$payment_method,$description,$recurring,$recurrence_period,$due_date" >> $FILE
     if [[ $recurring == "yes" ]]; then
-        if [[ $recurrence_period == "Bi-Weekly" ]]; then
-            # Handle bi-weekly recurrence
-            for i in 1 2 3 4 5 6; do
-                next_due_date=$(date -j -v+${i}w -f "%Y-%m-%d" "$due_date" +%F)
-                echo "$DATE,$TIME,$amount,$category,$payment_method,$description,$recurring,$recurrence_period,$next_due_date" >> $FILE
-            done
-        elif [[ $recurrence_period == "Monthly" ]]; then
-            # Handle monthly recurrence
-            for i in 1 2 3 4 5 6; do
-                next_due_date=$(date -j -v+${i}m -f "%Y-%m-%d" "$due_date" +%F)
-                echo "$DATE,$TIME,$amount,$category,$payment_method,$description,$recurring,$recurrence_period,$next_due_date" >> $FILE
-            done
-        fi
+        # Calculate and add recurring entries
+        for i in {1..6}; do
+            next_due_date=$(date -j -v+${i}m -f "%Y-%m-%d" "$due_date" +%F)
+            echo "$DATE,$TIME,$amount,$category,$payment_method,$description,$recurring,$recurrence_period,$next_due_date" >> $FILE
+        done
     fi
     echo -e "\e[32mEntry added successfully!\e[0m"
 }
@@ -102,19 +94,44 @@ calculate_totals() {
     echo "Total expenses from $start_date to $end_date: $total"
 }
 
+# Function to calculate and display real-time totals
+display_totals() {
+    total=0
+    while IFS=, read -r date time amount category payment_method description recurring recurrence_period due_date
+    do
+        total=$(echo "$total + $amount" | bc)
+    done < $FILE
+    echo "Total expenses recorded: $total"
+}
+
+# Function to highlight upcoming amounts due
+highlight_upcoming_dues() {
+    upcoming_date=$(date -j -v+7d +%F)
+    echo "Upcoming dues in the next 7 days:"
+    while IFS=, read -r date time amount category payment_method description recurring recurrence_period due_date
+    do
+        if [[ "$due_date" > "$(date +%F)" && "$due_date" <= "$upcoming_date" ]]; then
+            echo "Due $due_date: $amount for $category"
+        fi
+    done < $FILE
+}
+
+
 # Main menu
 while true; do
-    echo "Welcome to Suzy's Budget Tracker!"
+    echo "Welcome to your Budget Tracker!"
     echo "1. Add new entry"
     echo "2. View all entries"
     echo "3. Delete all entries"
     echo "4. Create new version"
     echo "5. Calculate totals for a period"
-    echo "6. Exit"
+    echo "6. Display total expenses"
+    echo "7. Highlight upcoming dues"
+    echo "8. Exit"
     echo "Choose an option:"
     read option
 
-    case $option in
+case $option in
         1) add_entry ;;
         2) view_entries ;;
         3) delete_all_entries ;;
@@ -124,7 +141,9 @@ while true; do
            echo "Enter the end date (YYYY-MM-DD):"
            read end_date
            calculate_totals "$start_date" "$end_date" ;;
-        6) break ;;
-        *) echo "Invalid option. Please try again." ;;
+        6) display_totals ;;
+        7) highlight_upcoming_dues ;;
+        8) break ;;
+        *) echo "Invalid option yo. Please try again." ;;
     esac
 done
