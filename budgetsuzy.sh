@@ -28,14 +28,14 @@ add_entry() {
     read amount
     echo "Enter the category (e.g., Groceries, Rent, Entertainment):"
     read category
-    echo "Enter the payment method (e.g., Cash, Credit Card, PayPal):"
+    echo "Enter the payment method (e.g., Debit, Credit Card, PayPal):"
     read payment_method
     echo "Enter a description or note (optional):"
     read description
     echo "Is this a recurring expense? (yes/no):"
     read recurring
     if [[ $recurring == "yes" ]]; then
-        echo "Enter the recurrence period (e.g., Monthly, Bi-Monthly):"
+        echo "Enter the recurrence period (e.g., Monthly, Bi-Weekly):"
         read recurrence_period
     else
         recurrence_period="N/A"
@@ -46,11 +46,19 @@ add_entry() {
     # Append the new entry to the file
     echo "$DATE,$TIME,$amount,$category,$payment_method,$description,$recurring,$recurrence_period,$due_date" >> $FILE
     if [[ $recurring == "yes" ]]; then
-        # Calculate and add recurring entries
-        for i in {1..6}; do
-            next_due_date=$(date -j -v+${i}m -f "%Y-%m-%d" "$due_date" +%F)
-            echo "$DATE,$TIME,$amount,$category,$payment_method,$description,$recurring,$recurrence_period,$next_due_date" >> $FILE
-        done
+        if [[ $recurrence_period == "Bi-Weekly" ]]; then
+            # Handle bi-weekly recurrence
+            for i in 1 2 3 4 5 6; do
+                next_due_date=$(date -j -v+${i}w -f "%Y-%m-%d" "$due_date" +%F)
+                echo "$DATE,$TIME,$amount,$category,$payment_method,$description,$recurring,$recurrence_period,$next_due_date" >> $FILE
+            done
+        elif [[ $recurrence_period == "Monthly" ]]; then
+            # Handle monthly recurrence
+            for i in 1 2 3 4 5 6; do
+                next_due_date=$(date -j -v+${i}m -f "%Y-%m-%d" "$due_date" +%F)
+                echo "$DATE,$TIME,$amount,$category,$payment_method,$description,$recurring,$recurrence_period,$next_due_date" >> $FILE
+            done
+        fi
     fi
     echo -e "\e[32mEntry added successfully!\e[0m"
 }
@@ -96,7 +104,7 @@ calculate_totals() {
 
 # Main menu
 while true; do
-    echo "Welcome to your Budget Tracker!"
+    echo "Welcome to Suzy's Budget Tracker!"
     echo "1. Add new entry"
     echo "2. View all entries"
     echo "3. Delete all entries"
