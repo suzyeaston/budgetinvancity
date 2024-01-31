@@ -88,8 +88,9 @@ delete_all_entries() {
 }
 
 calculate_totals() {
-    start_date=$(date -d "$1" +%s)
-    end_date=$(date -d "$2" +%s)
+    start_date=$(date -j -f "%Y-%m-%d" "$1" +%s)
+    end_date=$(date -j -f "%Y-%m-%d" "$2" +%s)
+
     total=0
     while IFS=, read -r date time amount category payment_method description recurring recurrence_period due_date
     do
