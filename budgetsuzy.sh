@@ -94,12 +94,12 @@ calculate_totals() {
     total=0
     while IFS=, read -r date time amount category payment_method description recurring recurrence_period due_date
     do
-        date_ts=$(date -d "$date" +%s)
+        date_ts=$(date -j -f "%Y-%m-%d" "$date" +%s)
         if [[ "$date_ts" -gt "$start_date" && "$date_ts" -le "$end_date" ]]; then
             total=$(echo "$total + $amount" | bc)
         fi
     done < "$FILE"
-    echo -e "${GREEN}Total expenses from $(date -d "@$start_date" +%F) to $(date -d "@$end_date" +%F): $total${NC}"
+    echo -e "${GREEN}Total expenses from $(date -j -f "%s" "$start_date" +%F) to $(date -j -f "%s" "$end_date" +%F): $total${NC}"
 }
 
 # Function to calculate and display real-time totals
