@@ -91,6 +91,9 @@ calculate_totals() {
     start_date=$(date -j -f "%Y-%m-%d" "$1" +%Y%m%d)
     end_date=$(date -j -f "%Y-%m-%d" "$2" +%Y%m%d)
 
+    echo "Start Date (YYYYMMDD): $start_date"
+    echo "End Date (YYYYMMDD): $end_date"
+
     total=0
     while IFS=, read -r date time amount category payment_method description recurring recurrence_period due_date
     do
@@ -99,14 +102,16 @@ calculate_totals() {
             # Convert the date to YYYYMMDD format for comparison
             if [[ $date =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
                 date_comp=$(date -j -f "%Y-%m-%d" "$date" +%Y%m%d)
+                echo "Processing Date: $date_comp, Amount: $amount"
                 # Compare the integer values of the dates
                 if (( date_comp >= start_date && date_comp <= end_date )); then
+                    echo "Adding $amount to total"
                     total=$(echo "$total + $amount" | bc)
                 fi
             fi
         fi
     done < "$FILE"
-    echo -e "${GREEN}Total expenses from $(date -j -f "%Y%m%d" "$start_date" +%F) to $(date -j -f "%Y%m%d" "$end_date" +%F): $total${NC}"
+    echo "Total expenses from $(date -j -f "%Y%m%d" "$start_date" +%F) to $(date -j -f "%Y%m%d" "$end_date" +%F): $total"
 }
 
 # Function to calculate and display real-time totals
