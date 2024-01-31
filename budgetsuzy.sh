@@ -1,16 +1,16 @@
-]#!/bin/bash
+#!/bin/bash
 
 DIR="$(dirname "$(realpath "$0")")"
 FILE="$DIR/budget.csv"
 DATE=$(date +%F) # Current date in YYYY-MM-DD format
 TIME=$(date +%T) # Current time
 
-# Colour codes
+# Color codes
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Colour
+NC='\033[0m' # No Color
 
 # Function to initialize or reset the CSV file
 initialize_csv() {
@@ -55,7 +55,7 @@ add_entry() {
     if [[ $recurring == "yes" ]]; then
         # Calculate and add recurring entries
         for i in {1..6}; do
-            next_due_date=$(date -j -v+${i}m -f "%Y-%m-%d" "$due_date" +%F)
+            next_due_date=$(date -d "$due_date +${i} month" +%F) # Adjusted for GNU date
             echo "$DATE,$TIME,$amount,$category,$payment_method,$description,$recurring,$recurrence_period,$next_due_date" >> "$FILE"
         done
     fi
@@ -88,17 +88,17 @@ delete_all_entries() {
 }
 
 calculate_totals() {
-    start_date=$(date -j -f "%Y-%m-%d" "$1" +%s)
-    end_date=$(date -j -f "%Y-%m-%d" "$2" +%s)
+    start_date=$(date -d "$1" +%s)
+    end_date=$(date -d "$2" +%s)
     total=0
     while IFS=, read -r date time amount category payment_method description recurring recurrence_period due_date
     do
-        date_ts=$(date -j -f "%Y-%m-%d" "$date" +%s)
+        date_ts=$(date -d "$date" +%s)
         if [[ "$date_ts" -gt "$start_date" && "$date_ts" -le "$end_date" ]]; then
             total=$(echo "$total + $amount" | bc)
         fi
     done < "$FILE"
-    echo -e "${GREEN}Total expenses from $(date -r "$start_date" +%F) to $(date -r "$end_date" +%F): $total${NC}"
+    echo -e "${GREEN}Total expenses from $(date -d "@$start_date" +%F) to $(date -d "@$end_date" +%F): $total${NC}"
 }
 
 # Function to calculate and display real-time totals
@@ -106,24 +106,32 @@ display_totals() {
     total=0
     while IFS=, read -r date time amount category payment_method description recurring recurrence_period due_date
     do
-        total=$(echo "$total + $amount" | bc)
+        # Ensure amount is numeric to avoid bc parse errors
+        if [[ $amount =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
+            total=$(echo "$total + $amount" | bc)
+        fi
     done < "$FILE"
     echo -e "${GREEN}Total expenses recorded: $total${NC}"
 }
 
 highlight_upcoming_dues() {
-    upcoming_date=$(date -j -v+7d +%F)
+    # Calculate upcoming date for the next 7 days using BSD `date` syntax
+    upcoming_date=$(date -v+7d +%F)
     upcoming_date_ts=$(date -j -f "%Y-%m-%d" "$upcoming_date" +%s)
     current_date_ts=$(date +%s)
 
-    echo -e "${YELLOW}Upcoming dues in the next 7 days:${NC}"
-    while IFS=, read -r date time amount category payment_method description recurring recurrence_period due_date
+    echo -e "${YELLOW}Upcoming dues in the next 7 days (including today):${NC}"
+    # Skip the header row and start reading from the second line
+    tail -n +2 "$FILE" | while IFS=, read -r date time amount category payment_method description recurring recurrence_period due_date
     do
-        due_date_ts=$(date -j -f "%Y-%m-%d" "$due_date" +%s)
-        if [[ "$due_date_ts" -gt "$current_date_ts" && "$due_date_ts" -le "$upcoming_date_ts" ]]; then
-            echo -e "${RED}Due $due_date: $amount for $category${NC}"
+        # Check if due_date is in the correct format to avoid trying to convert non-date values
+        if [[ $due_date =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+            due_date_ts=$(date -j -f "%Y-%m-%d" "$due_date" +%s 2> /dev/null)
+            if [[ "$due_date_ts" -ge "$current_date_ts" && "$due_date_ts" -le "$upcoming_date_ts" ]]; then
+                echo -e "${RED}Due $due_date: $amount for $category${NC}"
+            fi
         fi
-    done < "$FILE"
+    done
 }
 
 # Main menu
