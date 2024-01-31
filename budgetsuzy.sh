@@ -55,8 +55,8 @@ add_entry() {
     if [[ $recurring == "yes" ]]; then
         # Calculate and add recurring entries
         for i in {1..6}; do
-            next_due_date=$(date -d "$due_date +${i} month" +%F) # Adjusted for GNU date
-            echo "$DATE,$TIME,$amount,$category,$payment_method,$description,$recurring,$recurrence_period,$next_due_date" >> "$FILE"
+             next_due_date=$(date -j -v+${i}m -f "%Y-%m-%d" "$due_date" +%Y-%m-%d)
+             echo "$DATE,$TIME,$amount,$category,$payment_method,$description,$recurring,$recurrence_period,$next_due_date" >> "$FILE"
         done
     fi
     echo -e "${GREEN}Entry added successfully!${NC}"
