@@ -94,10 +94,15 @@ calculate_totals() {
     total=0
     while IFS=, read -r date time amount category payment_method description recurring recurrence_period due_date
     do
-        if [[ $date =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
-            date_ts=$(date -j -f "%Y-%m-%d" "$date" +%s)
-            if [[ "$date_ts" -ge "$start_date" && "$date_ts" -le "$end_date" ]]; then
-                total=$(echo "$total + $amount" | bc)
+        # Skip the header row
+        if [[ $date != "Date" ]]; then
+            # Ensure the date is in the correct format
+            if [[ $date =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+                date_ts=$(date -j -f "%Y-%m-%d" "$date" +%s)
+                # Check if the date falls within the specified range
+                if [[ "$date_ts" -ge "$start_date" && "$date_ts" -le "$end_date" ]]; then
+                    total=$(echo "$total + $amount" | bc)
+                fi
             fi
         fi
     done < "$FILE"
