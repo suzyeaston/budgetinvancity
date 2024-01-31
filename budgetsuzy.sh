@@ -98,13 +98,13 @@ calculate_totals() {
     while IFS=, read -r date time amount category payment_method description recurring recurrence_period due_date
     do
         # Skip the header row
-        if [[ $date != "Date" ]]; then
-            # Convert the date to YYYYMMDD format for comparison
-            if [[ $date =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
-                date_comp=$(date -j -f "%Y-%m-%d" "$date" +%Y%m%d)
-                echo "Processing Date: $date_comp, Amount: $amount"
-                # Compare the integer values of the dates
-                if (( date_comp >= start_date && date_comp <= end_date )); then
+        if [[ $due_date != "Due Date" ]]; then
+            # Convert the due_date to YYYYMMDD format for comparison
+            if [[ $due_date =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+                due_date_comp=$(date -j -f "%Y-%m-%d" "$due_date" +%Y%m%d)
+                echo "Processing Due Date: $due_date_comp, Amount: $amount"
+                # Compare the integer values of the due_dates
+                if (( due_date_comp >= start_date && due_date_comp <= end_date )); then
                     echo "Adding $amount to total"
                     total=$(echo "$total + $amount" | bc)
                 fi
