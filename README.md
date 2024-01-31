@@ -1,7 +1,7 @@
-# 🌌 Budget In Vancity- A Budget Tracker Inspired by Vancouver
+# 🌌 Budget In Vancity- A Budget Tracker Inspired by Vancouver's High Cost of Living
 
 ## 🚀 Overview
-Embark on a cosmic journey to manage your finances with **Budget In Vancity**! This Bash script for macOS navigates through the galaxy of budgeting, bringing the flair of Jem and the Rockers to your financial management. Track your expenses, view real-time totals, and get alerts for upcoming dues, all with a fun, interactive twist!
+Embark on a journey to manage your finances with **Budget In Vancity**! This Bash script for macOS navigates through the galaxy of budgeting, bringing the flair of Jem and the Rockers to your financial management. Track your expenses, view real-time totals, and get alerts for upcoming dues, all with a fun, interactive twist!
 
 ## 🌟 Features
 - 🛸 **Add New Entries**: Log your expenses with details such as amount, category, payment method, and more.
