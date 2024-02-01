@@ -87,6 +87,45 @@ delete_all_entries() {
     fi
 }
 
+# Function to edit an entry
+edit_entry() {
+    echo -e "${BLUE}Current entries:${NC}"
+    # Display entries with line numbers, skipping the header
+    tail -n +2 "$FILE" | nl
+    echo -e "${YELLOW}Enter the line number of the entry you want to edit:${NC}"
+    read line_num
+    let "line_num_to_edit=line_num+1"
+    
+    # Use awk to output the selected line
+    selected_entry=$(awk -v ln=$line_num_to_edit 'NR==ln' "$FILE")
+    
+    # Check if the user selected a valid line
+    if [[ -z "$selected_entry" ]]; then
+        echo -e "${RED}Invalid selection. Returning to menu.${NC}"
+        return
+    fi
+
+    echo -e "${YELLOW}You selected:${NC} $selected_entry"
+    echo -e "${YELLOW}Enter new values (leave blank to keep current):${NC}"
+    
+    read -p "Amount: " new_amount
+    read -p "Category: " new_category
+    read -p "Payment Method: " new_payment_method
+    read -p "Description: " new_description
+    read -p "Recurring (yes/no): " new_recurring
+    read -p "Recurrence Period: " new_recurrence_period
+    read -p "Due Date: " new_due_date
+    
+    # Prepare the new line
+    new_line="$DATE,$TIME,${new_amount:-$(cut -d',' -f3 <<< "$selected_entry")},${new_category:-$(cut -d',' -f4 <<< "$selected_entry")},${new_payment_method:-$(cut -d',' -f5 <<< "$selected_entry")},${new_description:-$(cut -d',' -f6 <<< "$selected_entry")},${new_recurring:-$(cut -d',' -f7 <<< "$selected_entry")},${new_recurrence_period:-$(cut -d',' -f8 <<< "$selected_entry")},${new_due_date:-$(cut -d',' -f9 <<< "$selected_entry")}"
+    
+    # Replace the line in the file
+    awk -v ln=$line_num_to_edit -v new_line="$new_line" 'BEGIN{FS=OFS=","} NR==ln {$0=new_line} 1' "$FILE" > "${FILE}.tmp" && mv "${FILE}.tmp" "$FILE"
+    
+    echo -e "${GREEN}Entry updated successfully!${NC}"
+}
+
+
 calculate_totals() {
     start_date=$(date -j -f "%Y-%m-%d" "$1" +%Y%m%d)
     end_date=$(date -j -f "%Y-%m-%d" "$2" +%Y%m%d)
@@ -157,7 +196,8 @@ while true; do
     echo "5. Calculate totals for a period"
     echo "6. Display total expenses"
     echo "7. Highlight upcoming dues"
-    echo "8. Exit"
+    echo "8. Edit an entry"
+    echo "9. Exit"
     echo "Choose an option:"
     read option
 
@@ -173,7 +213,8 @@ while true; do
            calculate_totals "$start_date" "$end_date" ;;
         6) display_totals ;;
         7) highlight_upcoming_dues ;;
-        8) break ;;
+        8) edit_entry ;;
+        9) break ;;
         *) echo -e "${RED}Invalid option yo. Please try again.${NC}" ;;
     esac
 done
