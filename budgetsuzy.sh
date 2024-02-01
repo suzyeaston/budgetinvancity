@@ -101,21 +101,24 @@ edit_entry() {
         return
     fi
 
-    # Extract the selected entry to show current values
     selected_entry=$(sed -n "${line_num_to_edit}p" "$FILE")
     IFS=, read -r curr_date curr_time curr_amount curr_category curr_payment_method curr_description curr_recurring curr_recurrence_period curr_due_date <<< "$selected_entry"
 
     echo -e "${YELLOW}Editing entry. Press enter to keep current value:${NC}"
+
     echo "Current Amount: $curr_amount"
-    read -p "New Amount (or press enter to keep): " new_amount
+    echo -n "New Amount (or press enter to keep): "
+    read new_amount
     new_amount=${new_amount:-$curr_amount}
 
     echo "Current Category: $curr_category"
-    read -p "New Category (or press enter to keep): " new_category
+    echo -n "New Category (or press enter to keep): "
+    read new_category
     new_category=${new_category:-$curr_category}
 
     echo "Current Payment Method: $curr_payment_method"
-    read -p "New Payment Method (or press enter to keep): " new_payment_method
+    echo -n "New Payment Method (or press enter to keep): "
+    read new_payment_method
     new_payment_method=${new_payment_method:-$curr_payment_method}
 
     # Construct the new line
