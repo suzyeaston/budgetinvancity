@@ -90,25 +90,41 @@ delete_all_entries() {
 # Function to edit an entry
 edit_entry() {
     echo -e "${BLUE}Current entries with line numbers:${NC}"
-    # Display entries with line numbers, excluding the header
     tail -n +2 "$FILE" | nl -w2 -s": "
     echo -e "${YELLOW}Enter the line number of the entry you want to edit:${NC}"
     read line_num
-    # Validate the input is a number
-    if ! [[ "$line_num" =~ ^[0-9]+$ ]]; then
-        echo -e "${RED}Please enter a valid line number.${NC}"
-        return
-    fi
-
-    # Calculate actual line number considering the header
     let "line_num_to_edit=line_num+1"
 
-    # Check if the line number is greater than the number of lines in the file
     total_lines=$(wc -l < "$FILE")
-    if [ "$line_num_to_edit" -gt "$total_lines" ] || [ "$line_num_to_edit" -eq 1 ]; then
-        echo -e "${RED}Line number is out of range.${NC}"
+    if ! [[ "$line_num" =~ ^[0-9]+$ ]] || [ "$line_num_to_edit" -gt "$total_lines" ] || [ "$line_num_to_edit" -eq 1 ]; then
+        echo -e "${RED}Invalid selection. Please enter a valid line number.${NC}"
         return
     fi
+
+    # Extract the selected entry to show current values
+    selected_entry=$(sed -n "${line_num_to_edit}p" "$FILE")
+    IFS=, read -r curr_date curr_time curr_amount curr_category curr_payment_method curr_description curr_recurring curr_recurrence_period curr_due_date <<< "$selected_entry"
+
+    echo -e "${YELLOW}Editing entry. Press enter to keep current value:${NC}"
+    echo "Current Amount: $curr_amount"
+    read -p "New Amount (or press enter to keep): " new_amount
+    new_amount=${new_amount:-$curr_amount}
+
+    echo "Current Category: $curr_category"
+    read -p "New Category (or press enter to keep): " new_category
+    new_category=${new_category:-$curr_category}
+
+    echo "Current Payment Method: $curr_payment_method"
+    read -p "New Payment Method (or press enter to keep): " new_payment_method
+    new_payment_method=${new_payment_method:-$curr_payment_method}
+
+    # Construct the new line
+    new_line="$curr_date,$curr_time,$new_amount,$new_category,$new_payment_method,$curr_description,$curr_recurring,$curr_recurrence_period,$curr_due_date"
+
+    # Replace the line in the file. Using a temporary file for safety.
+    awk -v ln="$line_num_to_edit" -v new_line="$new_line" 'BEGIN {FS=OFS=","} NR == ln {$0=new_line} {print}' "$FILE" > "${FILE}.tmp" && mv "${FILE}.tmp" "$FILE"
+
+    echo -e "${GREEN}Entry updated successfully!${NC}"
 }
 
 calculate_totals() {
