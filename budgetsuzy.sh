@@ -89,42 +89,27 @@ delete_all_entries() {
 
 # Function to edit an entry
 edit_entry() {
-    echo -e "${BLUE}Current entries:${NC}"
-    # Display entries with line numbers, skipping the header
-    tail -n +2 "$FILE" | nl
+    echo -e "${BLUE}Current entries with line numbers:${NC}"
+    # Display entries with line numbers, excluding the header
+    tail -n +2 "$FILE" | nl -w2 -s": "
     echo -e "${YELLOW}Enter the line number of the entry you want to edit:${NC}"
     read line_num
-    let "line_num_to_edit=line_num+1"
-    
-    # Use awk to output the selected line
-    selected_entry=$(awk -v ln=$line_num_to_edit 'NR==ln' "$FILE")
-    
-    # Check if the user selected a valid line
-    if [[ -z "$selected_entry" ]]; then
-        echo -e "${RED}Invalid selection. Returning to menu.${NC}"
+    # Validate the input is a number
+    if ! [[ "$line_num" =~ ^[0-9]+$ ]]; then
+        echo -e "${RED}Please enter a valid line number.${NC}"
         return
     fi
 
-    echo -e "${YELLOW}You selected:${NC} $selected_entry"
-    echo -e "${YELLOW}Enter new values (leave blank to keep current):${NC}"
-    
-    read -p "Amount: " new_amount
-    read -p "Category: " new_category
-    read -p "Payment Method: " new_payment_method
-    read -p "Description: " new_description
-    read -p "Recurring (yes/no): " new_recurring
-    read -p "Recurrence Period: " new_recurrence_period
-    read -p "Due Date: " new_due_date
-    
-    # Prepare the new line
-    new_line="$DATE,$TIME,${new_amount:-$(cut -d',' -f3 <<< "$selected_entry")},${new_category:-$(cut -d',' -f4 <<< "$selected_entry")},${new_payment_method:-$(cut -d',' -f5 <<< "$selected_entry")},${new_description:-$(cut -d',' -f6 <<< "$selected_entry")},${new_recurring:-$(cut -d',' -f7 <<< "$selected_entry")},${new_recurrence_period:-$(cut -d',' -f8 <<< "$selected_entry")},${new_due_date:-$(cut -d',' -f9 <<< "$selected_entry")}"
-    
-    # Replace the line in the file
-    awk -v ln=$line_num_to_edit -v new_line="$new_line" 'BEGIN{FS=OFS=","} NR==ln {$0=new_line} 1' "$FILE" > "${FILE}.tmp" && mv "${FILE}.tmp" "$FILE"
-    
-    echo -e "${GREEN}Entry updated successfully!${NC}"
-}
+    # Calculate actual line number considering the header
+    let "line_num_to_edit=line_num+1"
 
+    # Check if the line number is greater than the number of lines in the file
+    total_lines=$(wc -l < "$FILE")
+    if [ "$line_num_to_edit" -gt "$total_lines" ] || [ "$line_num_to_edit" -eq 1 ]; then
+        echo -e "${RED}Line number is out of range.${NC}"
+        return
+    fi
+}
 
 calculate_totals() {
     start_date=$(date -j -f "%Y-%m-%d" "$1" +%Y%m%d)
